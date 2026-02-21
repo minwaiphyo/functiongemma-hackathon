@@ -135,7 +135,7 @@ Text fallback — skip transcription.
 
 ## Dev A — Backend (FastAPI)
 
-**Owner:** Priyansh
+**Owner:** Dev A
 **Files:** `backend/server.py`, `backend/tools.py`
 **Deps:** `fastapi`, `uvicorn`, `python-multipart`
 
