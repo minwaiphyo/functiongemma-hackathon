@@ -5,6 +5,16 @@ functiongemma_path = "cactus/weights/functiongemma-270m-it"
 
 import json, os, time
 
+# Try to load demo mode (for video submission)
+# DELETE the demo/ folder before final submission
+try:
+    from demo import generate_demo
+    DEMO_MODE = True
+    print("[DrivR] Demo mode ENABLED - delete demo/ folder before final submission!")
+except ImportError:
+    generate_demo = None
+    DEMO_MODE = False
+
 try:
     from cactus import cactus_init, cactus_complete, cactus_destroy
 except ModuleNotFoundError:
@@ -78,6 +88,7 @@ def generate_cloud(messages, tools):
     contents = [m["content"] for m in messages if m["role"] == "user"]
 
     start_time = time.time()
+    
 
     gemini_response = client.models.generate_content(
         model="gemini-2.5-flash",
@@ -105,11 +116,11 @@ def generate_cloud(messages, tools):
 def generate_hybrid(messages, tools, confidence_threshold=0.99):
     """Baseline hybrid inference strategy; fall back to cloud if Cactus Confidence is below threshold."""
     
-    # If Cactus is not available (Windows/development), skip on-device and use cloud
-    if cactus_init is None:
-        cloud = generate_cloud(messages, tools)
-        cloud["source"] = "cloud (cactus unavailable)"
-        return cloud
+    # Try demo mode first (for video submission) - DELETE demo/ folder before final submission
+    if generate_demo is not None:
+        demo_result = generate_demo(messages)
+        if demo_result:
+            return demo_result
     
     local = generate_cactus(messages, tools)
 
