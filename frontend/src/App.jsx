@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+import InfoPage from './InfoPage.jsx'
 
 // ── Tool icon map ────────────────────────────────────────────────
 const TOOL_ICONS = {
@@ -223,6 +224,7 @@ export default function App() {
   const [history, setHistory] = useState([])
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
 
   const handleResult = (data) => {
     setLatestResult(data)
@@ -235,6 +237,15 @@ export default function App() {
     setTimeout(() => setError(null), 3000)
   }
 
+  if (showInfo) {
+    return (
+      <div className="app">
+        <div className="app__grid" aria-hidden="true" />
+        <InfoPage onBack={() => setShowInfo(false)} />
+      </div>
+    )
+  }
+
   return (
     <div className="app">
       {/* Background grid */}
@@ -244,9 +255,12 @@ export default function App() {
       <header className="header">
         <div className="header__logo">
           <span className="header__logo-icon">◈</span>
-          <span className="header__logo-text">Yapper</span>
+          <span className="header__logo-text">DrivR</span>
         </div>
-        <p className="header__tagline">Speak it. Done.</p>
+        <div className="header__row">
+          <p className="header__tagline">Speak it. Done.</p>
+          <button className="header__info-btn" onClick={() => setShowInfo(true)}>about</button>
+        </div>
       </header>
 
       {/* Main content */}
