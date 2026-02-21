@@ -1,6 +1,79 @@
 import { useState, useRef, useCallback } from 'react'
 import InfoPage from './InfoPage.jsx'
 
+// ── Audio Player Component ────────────────────────────────────────
+function AudioPlayer({ audioBase64, responseText, isPlaying, onPlay, onPause }) {
+  const audioRef = useRef(null)
+  const [duration, setDuration] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0)
+
+  if (!audioBase64) {
+    return null
+  }
+
+  const handlePlayClick = () => {
+    if (isPlaying) {
+      audioRef.current?.pause()
+      onPause()
+    } else {
+      audioRef.current?.play()
+      onPlay()
+    }
+  }
+
+  const handleTimeUpdate = (e) => {
+    setCurrentTime(e.target.currentTime)
+  }
+
+  const handleLoadedMetadata = (e) => {
+    setDuration(e.target.duration)
+  }
+
+  const handleEnded = () => {
+    onPause()
+  }
+
+  return (
+    <div className="audio-player">
+      <audio
+        ref={audioRef}
+        src={`data:audio/mp3;base64,${audioBase64}`}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={handleEnded}
+      />
+      <button
+        className="audio-player__btn"
+        onClick={handlePlayClick}
+        aria-label={isPlaying ? 'Pause audio' : 'Play audio response'}
+      >
+        {isPlaying ? (
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <rect x="6" y="4" width="4" height="16" />
+            <rect x="14" y="4" width="4" height="16" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <polygon points="5 3 19 12 5 21" />
+          </svg>
+        )}
+      </button>
+      <div className="audio-player__progress">
+        <div
+          className="audio-player__progress-bar"
+          style={{
+            width: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
+          }}
+        />
+      </div>
+      <span className="audio-player__time">
+        {Math.floor(currentTime)}s
+      </span>
+    </div>
+  )
+}
+
+
 // ── Tool icon map ────────────────────────────────────────────────
 const TOOL_ICONS = {
   get_weather: 'W',
@@ -25,9 +98,9 @@ function SourceBadge({ source }) {
 }
 
 // ── Action Card ──────────────────────────────────────────────────
-function ActionCard({ result }) {
+function ActionCard({ result, isAudioPlaying, onAudioPlay, onAudioPause }) {
   if (!result) return null
-  const { transcript, actions = [], function_calls = [], source, latency_ms = {} } = result
+  const { transcript, response_text, audio_base64 = "", actions = [], function_calls = [], source, latency_ms = {} } = result
 
   return (
     <div className="action-card action-card--enter">
@@ -38,6 +111,19 @@ function ActionCard({ result }) {
           <span className="action-card__latency">{Math.round(latency_ms.total ?? 0)}ms</span>
         </div>
       </div>
+
+      {response_text && (
+        <div className="action-card__response">
+          <p className="action-card__response-text">{response_text}</p>
+          <AudioPlayer
+            audioBase64={audio_base64}
+            responseText={response_text}
+            isPlaying={isAudioPlaying}
+            onPlay={onAudioPlay}
+            onPause={onAudioPause}
+          />
+        </div>
+      )}
 
       {actions.length > 0 ? (
         <ul className="action-card__actions">
@@ -225,16 +311,26 @@ export default function App() {
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
 
   const handleResult = (data) => {
     setLatestResult(data)
     setHistory(prev => [...prev, data])
     setError(null)
+    setIsAudioPlaying(false)
   }
 
   const handleError = (msg) => {
     setError(msg)
     setTimeout(() => setError(null), 3000)
+  }
+
+  const handleAudioPlay = () => {
+    setIsAudioPlaying(true)
+  }
+
+  const handleAudioPause = () => {
+    setIsAudioPlaying(false)
   }
 
   if (showInfo) {
@@ -276,7 +372,12 @@ export default function App() {
           <div className="error-toast">{error}</div>
         )}
 
-        <ActionCard result={latestResult} />
+        <ActionCard
+          result={latestResult}
+          isAudioPlaying={isAudioPlaying}
+          onAudioPlay={handleAudioPlay}
+          onAudioPause={handleAudioPause}
+        />
 
         <TextInput
           onResult={handleResult}

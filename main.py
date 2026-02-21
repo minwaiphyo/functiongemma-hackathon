@@ -104,6 +104,13 @@ def generate_cloud(messages, tools):
 
 def generate_hybrid(messages, tools, confidence_threshold=0.99):
     """Baseline hybrid inference strategy; fall back to cloud if Cactus Confidence is below threshold."""
+    
+    # If Cactus is not available (Windows/development), skip on-device and use cloud
+    if cactus_init is None:
+        cloud = generate_cloud(messages, tools)
+        cloud["source"] = "cloud (cactus unavailable)"
+        return cloud
+    
     local = generate_cactus(messages, tools)
 
     if local["confidence"] >= confidence_threshold:
