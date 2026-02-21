@@ -1,4 +1,4 @@
-# Frontend — VoiceAction (Yapper)
+# Frontend — VoiceAction (DrivR)
 
 Vite + React single-page app for voice and text commands. Dark theme, mobile-first, minimal dependencies.
 

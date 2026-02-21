@@ -258,7 +258,7 @@ export default function App() {
           <span className="header__logo-text">DrivR</span>
         </div>
         <div className="header__row">
-          <p className="header__tagline">Speak it. Done.</p>
+          <p className="header__tagline">Your personal driving assistant</p>
           <button className="header__info-btn" onClick={() => setShowInfo(true)}>about</button>
         </div>
       </header>
