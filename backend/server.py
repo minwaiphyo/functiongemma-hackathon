@@ -15,7 +15,7 @@ load_dotenv()
 from main import generate_hybrid, generate_cloud
 from backend.tools import TOOLS, simulate_actions
 
-app = FastAPI(title="VoiceAction API")
+app = FastAPI(title="DrivR API")
 
 # Allow requests from the Vite frontend
 app.add_middleware(
@@ -27,8 +27,8 @@ app.add_middleware(
 )
 
 MOCK_MODE = os.environ.get("MOCK_MODE", "true").lower() == "true"
-print(f"[VoiceAction] MOCK_MODE={MOCK_MODE}")
-print(f"[VoiceAction] GEMINI_API_KEY={'set' if os.environ.get('GEMINI_API_KEY') else 'MISSING!'}")
+print(f"[DrivR] MOCK_MODE={MOCK_MODE}")
+print(f"[DrivR] GEMINI_API_KEY={'set' if os.environ.get('GEMINI_API_KEY') else 'MISSING!'}")
 
 # Stubbed or actual Cactus models
 transcription_model = None
@@ -37,10 +37,10 @@ if not MOCK_MODE:
         sys.path.insert(0, "cactus/python/src")
         from cactus import cactus_init, cactus_transcribe, cactus_destroy
         whisper_path = "cactus/weights/whisper-tiny-en"
-        print(f"[VoiceAction] Loading Whisper model from {whisper_path}...")
+        print(f"[DrivR] Loading Whisper model from {whisper_path}...")
         transcription_model = cactus_init(whisper_path)
     except Exception as e:
-        print(f"[VoiceAction] Error loading whisper model: {e}")
+        print(f"[DrivR] Error loading whisper model: {e}")
         transcription_model = None
 
 

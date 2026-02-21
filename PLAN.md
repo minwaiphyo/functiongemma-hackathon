@@ -1,4 +1,4 @@
-# 🎙️ VoiceAction — Build Plan
+# 🎙️ DrivR — Build Plan
 
 **Time:** ~2.5 hours | **Team:** Dev A (Backend/FastAPI) + Dev B (Frontend/React)
 
@@ -198,7 +198,7 @@ Dev server on `http://localhost:5173`, proxy API calls to `http://localhost:8000
 
 **App.jsx** — single page with 4 sections:
 
-1. **Header** — title "VoiceAction", tagline "Speak it. Done."
+1. **Header** — title "DrivR", tagline "Your personal driving assistant."
 2. **MicButton** — large circular button, tap to start/stop recording
    - Uses `navigator.mediaDevices.getUserMedia` + `MediaRecorder`
    - Converts blob to WAV, sends to `POST /api/transcribe-and-act`
