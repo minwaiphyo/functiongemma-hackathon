@@ -1,20 +1,31 @@
+# DrivR — Voice Assistant for Drivers
+
+[![DrivR Demo](https://img.youtube.com/vi/-bdSYsMHgec/0.jpg)](https://www.youtube.com/watch?v=-bdSYsMHgec)
+
+> Built at the Cactus × Google DeepMind Hackathon, Singapore 2026. DrivR is a hands-free voice assistant for drivers that runs AI locally on-device using FunctionGemma + Cactus, with seamless fallback to Gemini for complex commands.
+
+---
+
 <img src="assets/banner.png" alt="Logo" style="border-radius: 30px; width: 100%;">
 
 ## Context
+
 - Cactus runs Google DeepMind's FunctionGemma at up to 3000 toks/sec prefill speed on M4 Macs.
-- While decode speed reaches 200 tokens/sec, all without GPU, to remain energy-efficient. 
-- FunctionGemma is great at tool calling, but small models are not the smartest for some tasks. 
-- There is a need to dynamically combine edge and cloud (Gemini Flash) to get the best of both worlds. 
+- While decode speed reaches 200 tokens/sec, all without GPU, to remain energy-efficient.
+- FunctionGemma is great at tool calling, but small models are not the smartest for some tasks.
+- There is a need to dynamically combine edge and cloud (Gemini Flash) to get the best of both worlds.
 - Cactus develops various strategies for choosing when to fall back to Gemini or FunctionGemma.
 
 ## Challenge
-- FunctionGemma is just a tool-call model, but tool calling is the core of agentic systems. 
-- You MUST design new strategies that decide when to stick with on-device or fall to cloud. 
-- You will be objectively ranked on tool-call correctness, speed and edge/cloud ratio (priortize local). 
+
+- FunctionGemma is just a tool-call model, but tool calling is the core of agentic systems.
+- You MUST design new strategies that decide when to stick with on-device or fall to cloud.
+- You will be objectively ranked on tool-call correctness, speed and edge/cloud ratio (priortize local).
 - You can focus on prompting, tool description patterns, confidence score algorithms, anything!
 - Please ensure at least 1 team member has a Mac, Cactus runs on Macs, mobile devices and wearables.
 
 ## Setup (clone this repo and hollistically follow)
+
 - Step 1: Fork this repo, clone to your Mac, open terminal.
 - Step 2: `git clone https://github.com/cactus-compute/cactus`
 - Step 3: `cd cactus && source ./setup && cd ..` (re-run in new terminal)
@@ -31,18 +42,20 @@
 - Note: Final objective score will be done on held-out evals, top 10 are then judged subjectively.
 
 ## Submissions
-- Your main task is to modify the **internal logic** of the `generate_hybrid` method in `main.py`. 
+
+- Your main task is to modify the **internal logic** of the `generate_hybrid` method in `main.py`.
 - Do not modify the input or output signature (function arguments and return variables) of the `generate_hybrid` method. Keep the hybrid interface compatible with `benchmark.py`.
 - Submit to the leaderboard `python submit.py --team "YourTeamName" --location "YourCity"`, only 1x every 1hr.
 - The dataset is a hidden Cactus eval, quite difficult for FunctionGemma by design.
 - Use `python benchmark.py` to iterate, but your best score is preserved.
 - For transparency, hackers can see live rankings on the [leaderboard](https://cactusevals.ngrok.app).
-- Leaderboard will start accepting submissions once event starts. 
+- Leaderboard will start accepting submissions once event starts.
 - The top 10 in each location will make it to judging.
 
-## Qualitative Judging 
+## Qualitative Judging
+
 - **Rubric 1**: The quality of your hybrid routing algorithm, depth and cleverness.
-- **Rubric 2**: End-to-end products that execute function calls to solve real-world problems. 
+- **Rubric 2**: End-to-end products that execute function calls to solve real-world problems.
 - **Rubric 3**: Building low-latency voice-to-action products, leveraging `cactus_transcribe`.
 
 ## Quick Example
@@ -63,9 +76,9 @@ cactus_destroy(model)
 
 ### `cactus_init(model_path, corpus_dir=None)`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `model_path` | `str` | Path to model weights directory |
+| Parameter    | Type  | Description                                 |
+| ------------ | ----- | ------------------------------------------- |
+| `model_path` | `str` | Path to model weights directory             |
 | `corpus_dir` | `str` | (Optional) dir of txt/md files for auto-RAG |
 
 ```python
@@ -75,21 +88,21 @@ model = cactus_init("weights/lfm2-rag", corpus_dir="./documents")
 
 ### `cactus_complete(model, messages, **options)`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `model` | handle | Model handle from `cactus_init` |
-| `messages` | `list\|str` | List of message dicts or JSON string |
-| `tools` | `list` | Optional tool definitions for function calling |
-| `temperature` | `float` | Sampling temperature |
-| `top_p` | `float` | Top-p sampling |
-| `top_k` | `int` | Top-k sampling |
-| `max_tokens` | `int` | Maximum tokens to generate |
-| `stop_sequences` | `list` | Stop sequences |
-| `include_stop_sequences` | `bool` | Include matched stop sequences in output (default: `False`) |
-| `force_tools` | `bool` | Constrain output to tool call format |
-| `tool_rag_top_k` | `int` | Select top-k relevant tools via Tool RAG (default: 2, 0 = use all tools) |
-| `confidence_threshold` | `float` | Minimum confidence for local generation (default: 0.7, triggers cloud_handoff when below) |
-| `callback` | `fn` | Streaming callback `fn(token, token_id, user_data)` |
+| Parameter                | Type        | Description                                                                               |
+| ------------------------ | ----------- | ----------------------------------------------------------------------------------------- |
+| `model`                  | handle      | Model handle from `cactus_init`                                                           |
+| `messages`               | `list\|str` | List of message dicts or JSON string                                                      |
+| `tools`                  | `list`      | Optional tool definitions for function calling                                            |
+| `temperature`            | `float`     | Sampling temperature                                                                      |
+| `top_p`                  | `float`     | Top-p sampling                                                                            |
+| `top_k`                  | `int`       | Top-k sampling                                                                            |
+| `max_tokens`             | `int`       | Maximum tokens to generate                                                                |
+| `stop_sequences`         | `list`      | Stop sequences                                                                            |
+| `include_stop_sequences` | `bool`      | Include matched stop sequences in output (default: `False`)                               |
+| `force_tools`            | `bool`      | Constrain output to tool call format                                                      |
+| `tool_rag_top_k`         | `int`       | Select top-k relevant tools via Tool RAG (default: 2, 0 = use all tools)                  |
+| `confidence_threshold`   | `float`     | Minimum confidence for local generation (default: 0.7, triggers cloud_handoff when below) |
+| `callback`               | `fn`        | Streaming callback `fn(token, token_id, user_data)`                                       |
 
 ```python
 # Basic completion
@@ -115,56 +128,58 @@ cactus_complete(model, messages, callback=on_token)
 ```
 
 **Response format** (all fields always present):
+
 ```json
 {
-    "success": true,
-    "error": null,
-    "cloud_handoff": false,
-    "response": "Hello! How can I help?",
-    "function_calls": [],
-    "confidence": 0.85,
-    "time_to_first_token_ms": 45.2,
-    "total_time_ms": 163.7,
-    "prefill_tps": 619.5,
-    "decode_tps": 168.4,
-    "ram_usage_mb": 245.67,
-    "prefill_tokens": 28,
-    "decode_tokens": 50,
-    "total_tokens": 78
+  "success": true,
+  "error": null,
+  "cloud_handoff": false,
+  "response": "Hello! How can I help?",
+  "function_calls": [],
+  "confidence": 0.85,
+  "time_to_first_token_ms": 45.2,
+  "total_time_ms": 163.7,
+  "prefill_tps": 619.5,
+  "decode_tps": 168.4,
+  "ram_usage_mb": 245.67,
+  "prefill_tokens": 28,
+  "decode_tokens": 50,
+  "total_tokens": 78
 }
 ```
 
 **Cloud handoff response** (when model detects low confidence):
+
 ```json
 {
-    "success": false,
-    "error": null,
-    "cloud_handoff": true,
-    "response": null,
-    "function_calls": [],
-    "confidence": 0.18,
-    "time_to_first_token_ms": 45.2,
-    "total_time_ms": 45.2,
-    "prefill_tps": 619.5,
-    "decode_tps": 0.0,
-    "ram_usage_mb": 245.67,
-    "prefill_tokens": 28,
-    "decode_tokens": 0,
-    "total_tokens": 28
+  "success": false,
+  "error": null,
+  "cloud_handoff": true,
+  "response": null,
+  "function_calls": [],
+  "confidence": 0.18,
+  "time_to_first_token_ms": 45.2,
+  "total_time_ms": 45.2,
+  "prefill_tps": 619.5,
+  "decode_tps": 0.0,
+  "ram_usage_mb": 245.67,
+  "prefill_tokens": 28,
+  "decode_tokens": 0,
+  "total_tokens": 28
 }
 ```
 
-- When `cloud_handoff` is `True`, the model's confidence dropped below `confidence_threshold` (default: 0.7) and recommends deferring to a cloud-based model for better results. 
+- When `cloud_handoff` is `True`, the model's confidence dropped below `confidence_threshold` (default: 0.7) and recommends deferring to a cloud-based model for better results.
 
 - You will NOT rely on this, hackers must design custom strategies to fall-back to cloud, that maximizes on-devices and correctness, while minimizing end-to-end latency!
 
 ### `cactus_transcribe(model, audio_path, prompt="")`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `model` | handle | Whisper model handle |
-| `audio_path` | `str` | Path to audio file (WAV) |
-| `prompt` | `str` | Whisper prompt for language/task |
+| Parameter    | Type   | Description                      |
+| ------------ | ------ | -------------------------------- |
+| `model`      | handle | Whisper model handle             |
+| `audio_path` | `str`  | Path to audio file (WAV)         |
+| `prompt`     | `str`  | Whisper prompt for language/task |
 
 ```python
 whisper = cactus_init("weights/whisper-small")
@@ -176,10 +191,10 @@ cactus_destroy(whisper)
 
 ### `cactus_embed(model, text, normalize=False)`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `model` | handle | Model handle |
-| `text` | `str` | Text to embed |
+| Parameter   | Type   | Description                              |
+| ----------- | ------ | ---------------------------------------- |
+| `model`     | handle | Model handle                             |
+| `text`      | `str`  | Text to embed                            |
 | `normalize` | `bool` | L2-normalize embeddings (default: False) |
 
 ```python
@@ -225,11 +240,11 @@ if error:
 
 Query RAG corpus for relevant text chunks. Requires model initialized with `corpus_dir`.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `model` | handle | Model handle (must have corpus_dir set) |
-| `query` | `str` | Query text |
-| `top_k` | `int` | Number of chunks to retrieve (default: 5) |
+| Parameter | Type   | Description                               |
+| --------- | ------ | ----------------------------------------- |
+| `model`   | handle | Model handle (must have corpus_dir set)   |
+| `query`   | `str`  | Query text                                |
+| `top_k`   | `int`  | Number of chunks to retrieve (default: 5) |
 
 ```python
 model = cactus_init("weights/lfm2-rag", corpus_dir="./documents")
@@ -239,5 +254,6 @@ for chunk in chunks:
 ```
 
 ## Next steps:
+
 - Join the [Reddit channel](https://www.reddit.com/r/cactuscompute/), ask any technical questions there.
-- To gain some technical insights on AI, checkout [Maths, CS & AI Compendium](https://github.com/HenryNdubuaku/maths-cs-ai-compendium). 
+- To gain some technical insights on AI, checkout [Maths, CS & AI Compendium](https://github.com/HenryNdubuaku/maths-cs-ai-compendium).
